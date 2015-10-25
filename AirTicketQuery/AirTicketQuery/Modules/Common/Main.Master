@@ -1,0 +1,108 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Main.master.cs" Inherits="AirTicketQuery.Modules.Common.Main" %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <title id="SystemTitle"></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width" />
+    <link href="../../resources/CSS/color.css" rel="stylesheet" />
+    <link href="../../resources/CSS/bootstrap-dropdown.css" rel="stylesheet" />
+    <link href="../../resources/CSS/easyui.css" rel="stylesheet" />
+    <link href="../../resources/CSS/jquery.modaldialog.css" rel="stylesheet" />
+    <link href="../../resources/CSS/mainStyle.css" rel="stylesheet" />
+    <link href="../../resources/CSS/font-awesome-4.3.0/css/font-awesome.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="../../resources/JS/jquery.min.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/jquery.easyui.min.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/jquery.blockUI.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/jquery.form.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/jquery.mask.min.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/jquery.modaldialog.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/jquery.number.min.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/jquery.validate.min.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/_MyFunction.js"></script>
+
+    <script type="text/javascript" src="../../resources/JS/bootstrap-dropdown.js"></script>
+
+    <script type="text/javascript" src="../../resources/js/jquery.event.hover.js"></script>
+
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="frmMain" runat="server">
+        <div id="container">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="width: 500px">
+                        <span style="font-size: 26px; font-weight: bold;">
+                            <asp:Literal ID="litSystemName" runat="server"></asp:Literal></span>
+                    </td>
+                    <td valign="bottom" style="padding-bottom: 2px; width: 150px">
+                        <span style="font-size: medium; font-style: italic;">
+                            <asp:Literal ID="litConfig" runat="server"></asp:Literal>
+                        </span>
+                    </td>
+                    <td style="width: 100px; padding-bottom: 2px" valign="bottom">
+                        <span style="font-size: medium; font-style: italic;">
+                            <asp:Literal ID="litVersion" runat="server"></asp:Literal></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="divMainMenu" class="divMainMenuCSS">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <ul class="nav">
+                        <li><a href="FlightQuery.aspx">Flight Ticket Qurey</a></li>
+                        <%--<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">MAINTAIN<b class="caret"></b></a>
+                            <ul class="dropdown-menu fixed-menu">
+                                <li><a href="Category.aspx">Category</a></li>
+                            </ul>
+                        </li>--%>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <asp:ContentPlaceHolder ID="mainCPM_FORM" runat="server"></asp:ContentPlaceHolder>
+        <asp:HiddenField ID="hfBaseUrl" runat="server" />
+    </form>
+    <div id="divMainCPH" class="divMainCPHCSS">
+        <asp:ContentPlaceHolder ID="mainCPH" runat="server"></asp:ContentPlaceHolder>
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            var lastChild = $("#divMainMenu ul.nav > li").children("a:last");
+            if (lastChild.length > 0) { lastChild.css("border-right", "1px solid #E6E6E6"); }
+            $("a.dropdown-toggle").hover(function (e) { $(this).click(); }).click(function (e) {
+                var findChild = $(this).parent().children(".fixed-menu:first");
+                if (findChild.length > 0) {
+                    var windowPos = $(window).width();
+                    var submenuPos = $(this).offset().left + Math.floor(windowPos / 2);
+                    if (submenuPos > windowPos) { findChild.addClass("pull-right"); }
+                }
+            });
+        });
+    </script>
+
+    <asp:ContentPlaceHolder ID="cphJS" runat="server"></asp:ContentPlaceHolder>
+
+    <footer>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p>&copy; <%: DateTime.Now.Year %> - Online Air Ticket Query </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

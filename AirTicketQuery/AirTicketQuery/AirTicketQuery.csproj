@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F359105A-664A-4CAF-9210-A1ED318DB980}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AirTicketQuery</RootNamespace>
+    <AssemblyName>AirTicketQuery</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DesktopBuildPackageLocation>obj\Debug\Package</DesktopBuildPackageLocation>
+    <DeployIisAppPath>Default Web Site/RMS</DeployIisAppPath>
+    <PublishDatabases>false</PublishDatabases>
+    <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
+    <PrecompileBeforePublish>false</PrecompileBeforePublish>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <PackageAsSingleFile>false</PackageAsSingleFile>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllReferences\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DllReferences\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\DllReferences\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+    <Content Include="Default.aspx" />
+    <Content Include="Modules\Ajax\Controller.asmx" />
+    <Content Include="Modules\Main\FlightQuery.aspx" />
+    <Content Include="resources\CSS\bootstrap-dropdown.css" />
+    <Content Include="resources\CSS\color.css" />
+    <Content Include="resources\CSS\easyui.css" />
+    <Content Include="resources\CSS\font-awesome-4.3.0\css\font-awesome.css" />
+    <Content Include="resources\CSS\images\accordion_arrows.png" />
+    <Content Include="resources\CSS\images\blank.gif" />
+    <Content Include="resources\CSS\images\calendar_arrows.png" />
+    <Content Include="resources\CSS\images\combo_arrow.png" />
+    <Content Include="resources\CSS\images\datagrid_icons.png" />
+    <Content Include="resources\CSS\images\datebox_arrow.png" />
+    <Content Include="resources\CSS\images\indicator.gif" />
+    <Content Include="resources\CSS\images\layout_arrows.png" />
+    <Content Include="resources\CSS\images\linkbutton_bg.png" />
+    <Content Include="resources\CSS\images\loading.gif" />
+    <Content Include="resources\CSS\images\menu_arrows.png" />
+    <Content Include="resources\CSS\images\messager_icons.png" />
+    <Content Include="resources\CSS\images\pagination_icons.png" />
+    <Content Include="resources\CSS\images\panel_tools.png" />
+    <Content Include="resources\CSS\images\searchbox_button.png" />
+    <Content Include="resources\CSS\images\slider_handle.png" />
+    <Content Include="resources\CSS\images\spinner_arrows.png" />
+    <Content Include="resources\CSS\images\tabs_icons.png" />
+    <Content Include="resources\CSS\images\tree_icons.png" />
+    <Content Include="resources\CSS\images\validatebox_warning.png" />
+    <Content Include="resources\CSS\jquery.autocomplete.css" />
+    <Content Include="resources\CSS\jquery.modaldialog.css" />
+    <Content Include="resources\CSS\mainStyle.css" />
+    <Content Include="resources\images\background.gif" />
+    <Content Include="resources\images\border.gif" />
+    <Content Include="resources\images\iconProcessing.gif" />
+    <Content Include="resources\JS\ATQ.FlightQuery.js" />
+    <Content Include="resources\JS\bootstrap-dropdown.js" />
+    <Content Include="resources\JS\jquery.autocomplete.min.js" />
+    <Content Include="resources\JS\jquery.blockUI.js" />
+    <Content Include="resources\JS\jquery.easyui.min.js" />
+    <Content Include="resources\JS\jquery.event.hover.js" />
+    <Content Include="resources\JS\jquery.form.js" />
+    <Content Include="resources\JS\jquery.mask.min.js" />
+    <Content Include="resources\JS\jquery.min.js" />
+    <Content Include="resources\JS\jquery.modaldialog.js" />
+    <Content Include="resources\JS\jquery.number.min.js" />
+    <Content Include="resources\JS\jquery.validate.min.js" />
+    <Content Include="resources\JS\_MyFunction.js" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\DomesticAirline\DomesticAirline.disco" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Web References\DomesticAirline\DomesticAirline.wsdl" />
+    <Content Include="Web References\DomesticAirline\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Ajax\Controller.asmx.cs">
+      <DependentUpon>Controller.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Modules\Ajax\PageSnatch.cs" />
+    <Compile Include="Modules\Code\DataSetHelper.cs" />
+    <Compile Include="Modules\Code\DB.cs" />
+    <Compile Include="Modules\Code\EntityUtil.cs" />
+    <Compile Include="Modules\Code\ExtensionsHelpers.cs" />
+    <Compile Include="Modules\Code\Log.cs" />
+    <Compile Include="Modules\Code\ModEntity.cs" />
+    <Compile Include="Modules\Code\SessionConst.cs" />
+    <Compile Include="Modules\Code\SessionHelper.cs" />
+    <Compile Include="Modules\Code\SystemConst.cs" />
+    <Compile Include="Modules\Code\SysUtil.cs" />
+    <Compile Include="Modules\Code\xmlHelper.cs" />
+    <Compile Include="Modules\Common\BasePage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Common\Main.Master.cs">
+      <DependentUpon>Main.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Common\Main.Master.designer.cs">
+      <DependentUpon>Main.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Main\FlightQuery.aspx.cs">
+      <DependentUpon>FlightQuery.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Main\FlightQuery.aspx.designer.cs">
+      <DependentUpon>FlightQuery.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\DomesticAirline\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Modules\Common\Main.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="resources\CSS\font-awesome-4.3.0\fonts\fontawesome-webfont.eot" />
+    <Content Include="resources\CSS\font-awesome-4.3.0\fonts\fontawesome-webfont.svg" />
+    <Content Include="resources\CSS\font-awesome-4.3.0\fonts\fontawesome-webfont.ttf" />
+    <Content Include="resources\CSS\font-awesome-4.3.0\fonts\fontawesome-webfont.woff" />
+    <Content Include="resources\CSS\font-awesome-4.3.0\fonts\fontawesome-webfont.woff2" />
+    <Content Include="resources\CSS\font-awesome-4.3.0\fonts\FontAwesome.otf" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://webservice.webxml.com.cn/webservices/DomesticAirline.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\DomesticAirline\</RelPath>
+      <UpdateFromURL>http://webservice.webxml.com.cn/webservices/DomesticAirline.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>AirTicketQuery_DomesticAirline_DomesticAirline</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release' ">
+    <Message Text="Copying to Deployment Dir:" />
+    <Copy SourceFiles="@(Content)" DestinationFolder="..\PreCompiledWebProj\%(Content.RelativeDir)" />
+    <CreateItem Include="$(OutputPath)\*" Exclude="$(OutputPath)\*.pdb">
+      <Output TaskParameter="Include" ItemName="Binaries" />
+    </CreateItem>
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="..\PreCompiledWebProj\bin" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>1030</DevelopmentServerPort>
+          <DevelopmentServerVPath>/CCAS</DevelopmentServerVPath>
+          <IISUrl>http://localhost:1030</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>
