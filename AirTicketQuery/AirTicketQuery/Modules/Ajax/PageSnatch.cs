@@ -33,7 +33,6 @@ namespace AirTicketQuery.Modules.Ajax
         {
             try
             {
-                bool completed = false;
                 int interval = 500;
                 Thread thread = new Thread(delegate()
                 {
@@ -43,31 +42,39 @@ namespace AirTicketQuery.Modules.Ajax
                         browser.ScrollBarsEnabled = false;
                         browser.AllowNavigation = true;
                         DateTime startTime = DateTime.Now;
-
-                        browser.DocumentCompleted += delegate(object sender, WebBrowserDocumentCompletedEventArgs e)
-                        {
-                            this.Text = browser.Document.Body.OuterHtml;
-                            string url0 = browser.Document.Url.ToString();
-                            completed = url0.Equals(e.Url.ToString());
-                        };
-
-                        browser.Navigate(url);
-                        while (!completed)
-                        {
-                            System.Windows.Forms.Application.DoEvents();
-                            System.Threading.Thread.Sleep(interval);
-                        }
-
-                        //while (browser.ReadyState != WebBrowserReadyState.Complete)
-                        //    System.Windows.Forms.Application.DoEvents();
-
+                        bool isbusy = true;
+                        bool isRefresh = false;
+                        bool completed = false;
                         int count = 6;
                         int index = 0;
                         int length = 0;
 
-                        bool isbusy = true;
-                        while (isbusy)
+                        do
                         {
+                            browser.DocumentCompleted += delegate(object sender, WebBrowserDocumentCompletedEventArgs e)
+                            {
+                                this.Text = browser.Document.Body.OuterHtml;
+                                string url0 = browser.Document.Url.ToString();
+                                completed = url0.Equals(e.Url.ToString());
+                            };
+
+                            if (!isRefresh)
+                                browser.Navigate(url);
+                            while (!completed)
+                            {
+                                System.Windows.Forms.Application.DoEvents();
+                                System.Threading.Thread.Sleep(interval);
+                                double t = Math.Ceiling((DateTime.Now - startTime).TotalSeconds);
+                                if (t >= this.timeout)
+                                {
+                                    this.Error = new Exception("Visiting about new exception delay, since the setting is timeout");
+                                    break;
+                                }
+                            }
+
+                            //while (browser.ReadyState != WebBrowserReadyState.Complete)
+                            //    System.Windows.Forms.Application.DoEvents();
+
                             this.TextAsync = browser.Document.Body.OuterHtml;
                             string strRegex = "(?<ITEM><figure class=\"flight-info none\" id=\"flight-info\" style=\"display: block;\">)[\\S\\s]*?(?=</figure>)";
                             Regex re = new Regex(strRegex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -78,21 +85,14 @@ namespace AirTicketQuery.Modules.Ajax
                                 break;
                             }
 
-
-                            System.Threading.Thread.Sleep(interval);
-                            double t = Math.Ceiling((DateTime.Now - startTime).TotalSeconds);
-                            if (t >= this.timeout)
-                            {
-                                this.Error = new Exception("Visiting about new exception delay, since the setting is timeout");
-                                break;
-                            }
-
                             //System.Windows.Forms.Application.DoEvents();
                             //BrowserEventHandler browserEventHanler = delegate() { isbusy = !browser.IsBusy; };
                             //browser.Invoke(browserEventHanler);
                             try
                             {
                                 browser.Document.InvokeScript("flight.submit()");
+                                isRefresh = true;
+                                completed = false;
                             }
                             catch (Exception ex)
                             {
@@ -108,8 +108,7 @@ namespace AirTicketQuery.Modules.Ajax
                             }
 
                             length = browser.Document.Body.OuterHtml.Length;
-
-                        }
+                        } while (isbusy);
                     }
                 });
                 thread.SetApartmentState(ApartmentState.STA);

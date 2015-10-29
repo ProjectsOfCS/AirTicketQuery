@@ -155,6 +155,7 @@
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Ajax\clsParseCTRIP.cs" />
     <Compile Include="Modules\Ajax\Controller.asmx.cs">
       <DependentUpon>Controller.asmx</DependentUpon>
       <SubType>Component</SubType>

@@ -80,7 +80,9 @@ namespace AirTicketQuery.Modules.Ajax
                     City toCity = EntityUtil.Create<City>(dbi.GetDataTable(sqlCity, this.InitSqlParams("C_CODE", strToCity)).Rows[0]);
 
                     //lstFlight.AddRange(this.CSAIR_Get(strFromCity, strToCity, strDeparture));
-                    lstFlight.AddRange(this.WS_Get(fromCity.C_NAME, toCity.C_NAME, strDeparture));
+                    //lstFlight.AddRange(this.WS_Get(fromCity.C_NAME, toCity.C_NAME, strDeparture));
+                    lstFlight.AddRange(this.CTRIP_Get(fromCity.C_CODE, toCity.C_CODE, strDeparture));
+
                     //todo: This function not stable, I still work on it. 
                     //lstFlight.AddRange(this.CEAIR_Get(strFromCity, strToCity, strDeparture));
                     if (!string.IsNullOrEmpty(sort) && !string.IsNullOrEmpty(order))
@@ -204,6 +206,25 @@ namespace AirTicketQuery.Modules.Ajax
                 lstFlight.Add(f);
             }
 
+            return lstFlight;
+        }
+
+        private List<Flight> CTRIP_Get(string fromCity, string toCity, string departDate)
+        {
+            List<Flight> lstFlight = new List<Flight>();
+            //http://openapi.ctrip.com/logicsvr/AjaxServerNew.ashx?datatype=jsonp&callProxyKey=flightsearch&requestJson={%22AllianceID%22:%20%227480%22,%22SID%22:%20%22172916%22,%22SecretKey%22:%20%220FEFFC1F-D220-4AAD-8F24-642C962092B7%22,%22Routes%22:%20[{%22DepartCity%22:%20%22BJS%22,%22ArriveCity%22:%20%22CAN%22,%22DepartDate%22:%20%222015-11-05%22}]}
+            DateTime dtDepart = DateTime.Parse(departDate);
+            string strDepatTime = dtDepart.ToString("yyyy-MM-dd");
+            string strParams = string.Format("\"DepartCity\": \"{0}\",\"ArriveCity\": \"{1}\",\"DepartDate\": \"{2}\"", fromCity, toCity, dtDepart.ToString("yyyy-MM-dd"));
+            string strUrl = "http://openapi.ctrip.com/logicsvr/AjaxServerNew.ashx?datatype=jsonp&callProxyKey=flightsearch&requestJson={\"AllianceID\": \"7480\",\"SID\": \"172916\",\"SecretKey\": \"0FEFFC1F-D220-4AAD-8F24-642C962092B7\",\"Routes\": [{" + strParams + "}]}";
+
+            WebClient client = new WebClient();
+            string downloadStr = client.DownloadString(new Uri(strUrl));
+            System.Diagnostics.Debug.Write(downloadStr);
+            //string path1 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "11.txt");
+            //string downloadStr = File.ReadAllText(path1, System.Text.Encoding.GetEncoding("GB2312"));
+            System.Diagnostics.Debug.Write(downloadStr);
+            lstFlight = clsParseCTRIP.ParseJson(downloadStr);
             return lstFlight;
         }
 
