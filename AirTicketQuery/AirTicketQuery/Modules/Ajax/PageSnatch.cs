@@ -58,6 +58,9 @@ namespace AirTicketQuery.Modules.Ajax
                             System.Threading.Thread.Sleep(interval);
                         }
 
+                        //while (browser.ReadyState != WebBrowserReadyState.Complete)
+                        //    System.Windows.Forms.Application.DoEvents();
+
                         int count = 6;
                         int index = 0;
                         int length = 0;
@@ -65,16 +68,36 @@ namespace AirTicketQuery.Modules.Ajax
                         bool isbusy = true;
                         while (isbusy)
                         {
+                            this.TextAsync = browser.Document.Body.OuterHtml;
+                            string strRegex = "(?<ITEM><figure class=\"flight-info none\" id=\"flight-info\" style=\"display: block;\">)[\\S\\s]*?(?=</figure>)";
+                            Regex re = new Regex(strRegex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                            Match mc = re.Match(this.TextAsync);
+                            if (mc.Length > 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine(mc.Value);
+                                break;
+                            }
+
+
                             System.Threading.Thread.Sleep(interval);
-                            double t = Math.Ceiling((DateTime.Now - startTime).TotalMilliseconds);
+                            double t = Math.Ceiling((DateTime.Now - startTime).TotalSeconds);
                             if (t >= this.timeout)
                             {
                                 this.Error = new Exception("Visiting about new exception delay, since the setting is timeout");
                                 break;
                             }
 
-                            BrowserEventHandler browserEventHanler = delegate() { isbusy = !browser.IsBusy; };
-                            browser.Invoke(browserEventHanler);
+                            //System.Windows.Forms.Application.DoEvents();
+                            //BrowserEventHandler browserEventHanler = delegate() { isbusy = !browser.IsBusy; };
+                            //browser.Invoke(browserEventHanler);
+                            try
+                            {
+                                browser.Document.InvokeScript("flight.submit()");
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.Write(ex);
+                            }
 
                             if (!isbusy)
                             {
@@ -85,7 +108,7 @@ namespace AirTicketQuery.Modules.Ajax
                             }
 
                             length = browser.Document.Body.OuterHtml.Length;
-                            this.TextAsync = browser.Document.Body.OuterHtml;
+
                         }
                     }
                 });
