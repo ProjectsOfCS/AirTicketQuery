@@ -3,119 +3,100 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using AirTicketQuery.Modules.Code;
 
 namespace AirTicketQuery.Modules.Ajax
 {
     public class PageSnatch
     {
         delegate void BrowserEventHandler();
-        private readonly string url = string.Empty;
-        private int timeout;
-        private const int defaultTimeout = 10;
-
-        public PageSnatch(string url)
+        private int hitCount = 0;
+        public string Navigate(string url, int timeout)
         {
-            this.timeout = defaultTimeout;
-            this.url = url;
-        }
-
-        public PageSnatch(string url, int timeout)
-            : this(url)
-        {
-            this.timeout = timeout;
-        }
-
-        public Exception Error { set; get; }
-        public string Text { set; get; }
-        public string TextAsync { set; get; }
-
-        public void Navigate()
-        {
+            string gethtml = string.Empty;
             try
             {
                 int interval = 500;
-                Thread thread = new Thread(delegate()
+                using (WebBrowser browser = new WebBrowser())
                 {
-                    using (WebBrowser browser = new WebBrowser())
+                    browser.ScriptErrorsSuppressed = false;                   
+                    DateTime startTime = DateTime.Now;
+                    bool isbusy = true;
+                    int length = 0;
+                    //browser.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(browser_DocumentCompleted);
+                    //browser.Navigating += new WebBrowserNavigatingEventHandler(browser_Navigating);
+                    browser.Navigate(url);
+                    while (browser.ReadyState != WebBrowserReadyState.Complete)
                     {
-                        browser.ScriptErrorsSuppressed = false;
-                        browser.ScrollBarsEnabled = false;
-                        browser.AllowNavigation = true;
-                        DateTime startTime = DateTime.Now;
-                        bool isbusy = true;
-                        bool isRefresh = false;
-                        bool completed = false;
-                        int count = 6;
-                        int index = 0;
-                        int length = 0;
-
-                        do
-                        {
-                            browser.DocumentCompleted += delegate(object sender, WebBrowserDocumentCompletedEventArgs e)
-                            {
-                                this.Text = browser.Document.Body.OuterHtml;
-                                string url0 = browser.Document.Url.ToString();
-                                completed = url0.Equals(e.Url.ToString());
-                            };
-
-                            if (!isRefresh)
-                                browser.Navigate(url);
-                            while (!completed)
-                            {
-                                System.Windows.Forms.Application.DoEvents();
-                                System.Threading.Thread.Sleep(interval);
-                                double t = Math.Ceiling((DateTime.Now - startTime).TotalSeconds);
-                                if (t >= this.timeout)
-                                {
-                                    this.Error = new Exception("Visiting about new exception delay, since the setting is timeout");
-                                    break;
-                                }
-                            }
-
-                            //while (browser.ReadyState != WebBrowserReadyState.Complete)
-                            //    System.Windows.Forms.Application.DoEvents();
-
-                            this.TextAsync = browser.Document.Body.OuterHtml;
-                            string strRegex = "(?<ITEM><figure class=\"flight-info none\" id=\"flight-info\" style=\"display: block;\">)[\\S\\s]*?(?=</figure>)";
-                            Regex re = new Regex(strRegex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
-                            Match mc = re.Match(this.TextAsync);
-                            if (mc.Length > 0)
-                            {
-                                System.Diagnostics.Debug.WriteLine(mc.Value);
-                                break;
-                            }
-
-                            //System.Windows.Forms.Application.DoEvents();
-                            //BrowserEventHandler browserEventHanler = delegate() { isbusy = !browser.IsBusy; };
-                            //browser.Invoke(browserEventHanler);
-                            try
-                            {
-                                browser.Document.InvokeScript("flight.submit()");
-                                isRefresh = true;
-                                completed = false;
-                            }
-                            catch (Exception ex)
-                            {
-                                System.Diagnostics.Debug.Write(ex);
-                            }
-
-                            if (!isbusy)
-                            {
-                                int len = browser.Document.Body.OuterHtml.Length;
-                                if (len == length) { index++; }
-                                else { index = 0; length = len; }
-                                if (index == count) { isbusy = false; }
-                            }
-
-                            length = browser.Document.Body.OuterHtml.Length;
-                        } while (isbusy);
+                        Application.DoEvents();
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Still Loading");
                     }
-                });
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
-                thread.Join();
+
+                    while (hitCount < 10)
+                    {
+                        double t = Math.Ceiling((DateTime.Now - startTime).TotalSeconds);
+                        if (t >= timeout)
+                        {
+                            throw new Exception("Visiting about new exception delay, since the setting is timeout");
+                        }
+
+                        BrowserEventHandler browserEventHanler = delegate() { isbusy = !browser.IsBusy; };
+                        browser.Invoke(browserEventHanler);
+
+                        if (browser.Document.All["flight-info"] != null)
+                        {
+                            int len = 0;
+                            if (!string.IsNullOrEmpty(browser.Document.All["flight-info"].InnerHtml))
+                                len = browser.Document.All["flight-info"].InnerHtml.Length;
+                            if (len == length)
+                            {
+                                hitCount++;
+                            }
+                            else
+                            {
+                                hitCount = 0; length = len;
+                            }
+
+                            //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All["flight-info"].InnerHtml);
+                        }
+
+                        if (!string.IsNullOrEmpty(browser.Document.All["flight-info"].InnerHtml))
+                            length = browser.Document.All["flight-info"].InnerHtml.Length;
+                        Application.DoEvents();
+                        System.Threading.Thread.Sleep(interval);
+                    }
+
+                    if (browser.Document.All["flight-info"] != null)
+                    {
+                        System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All["flight-info"].InnerHtml);
+                        gethtml = browser.Document.All["flight-info"].InnerHtml;
+                    }
+
+                    //var htmldocument = (mshtml.HTMLDocument)browser.Document.DomDocument; System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
+                    //System.Diagnostics.Debug.WriteLine(htmldocument.documentElement.outerHTML); System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
+                    //System.Diagnostics.Debug.WriteLine(browser.Document.Body.OuterHtml);
+                }
             }
-            catch (Exception ex) { throw ex; }
+            catch (Exception ex)
+            {
+                Log.LogErr(ex);
+            }
+
+            return gethtml;
         }
+
+        //private void browser_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+        //{
+        //    //Log.LogInfo("browser_Navigating called.")
+        //    System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "browser_Navigating called.");
+        //    hitCount++;
+        //}
+
+        //private void browser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        //{
+        //    System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "browser_DocumentCompleted called.");
+        //    hitCount++;
+        //}
     }
 }

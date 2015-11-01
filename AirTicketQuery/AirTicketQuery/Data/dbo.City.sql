@@ -21,13 +21,13 @@ INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'北京', N'P
 INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'上海', N'SHA',N'pvg')
 INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'长沙', N'CSX',N'csx')
 INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'广州', N'CAN',N'can')
-INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'成都', N'CTU',N'')
-INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'海口', N'HAK',N'')
-INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'重庆', N'CKG',N'')
-INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'深圳', N'SZX',N'')
-INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'杭州', N'HGH',N'')
-INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES ( N'大连', N'DLC',N'')
-INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES ( N'武汉', N'WUH',N'')
+INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'成都', N'CTU',N'ctu')
+INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'海口', N'HAK',N'hak')
+INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'重庆', N'CKG',N'ckg')
+INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'深圳', N'SZX',N'szx')
+INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES (N'杭州', N'HGH',N'hgh')
+INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES ( N'大连', N'DLC',N'dlc')
+INSERT INTO [dbo].[City] ([C_NAME], [C_CODE],[C_CE_CODE]) VALUES ( N'武汉', N'WUH',N'wuh')
 GO
 update dbo.City set C_WS_CODE='YIE' where C_NAME=N'阿尔山';
 update dbo.City set C_WS_CODE='AKU' where C_NAME=N'阿克苏';

@@ -11,7 +11,7 @@
         <div id="toolbar" style="display: none; padding: 5px">
             From:<input class="easyui-combobox" id="ddlFromCity" name="C_FROM" style="width: 100px" />
             To:<input class="easyui-combobox" id="ddlToCity" name="C_TO" style="width: 100px" />
-            Departure:<input id="txtC_Departure" type="text" class="easyui-datebox" required="required" style="width: 100px">
+            Departure:<input id="txtC_Departure" type="text" class="easyui-datebox" required="required" style="width: 100px" data-options="formatter:DateFormatter,parser:DateParser">
             <a id="lnkSearch" href="javascript:void(0)" class="easyui-linkbutton"><i class="fa fa-search blueIcon">&nbsp;</i>search</a>
         </div>
     </div>

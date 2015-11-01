@@ -15,7 +15,7 @@ $(function () {
         displayMsg: '{from} - {to}({total})',
         columns: [[
                 { field: 'chk', checkbox: true },
-                { field: 'C_From', title: '出发城市', resizable: true,sortable:true, width: 65 },
+                { field: 'C_From', title: '出发城市', resizable: true, sortable: true, width: 65 },
                 { field: 'C_To', title: '到达城市', resizable: true, sortable: true, width: 65 },
                 { field: 'C_Departure', title: '出发日期', resizable: true, sortable: true, width: 75 },
                 { field: 'C_DateSource', title: '数据来源网站', sortable: true, resizable: true, width: 85 },
@@ -24,7 +24,7 @@ $(function () {
                 { field: 'C_DEPTIME', title: '起飞时间', sortable: true, resizable: true, width: 55 },
                 { field: 'C_ARRTIME', title: '到达时间', sortable: true, resizable: true, width: 55 },
                 { field: 'C_TotalTime', title: '航程时长', sortable: true, resizable: true, width: 100 },
-                { field: 'C_FirstClass', title: '头等舱', sortable: true, align:'right', resizable: true, width: 65 },
+                { field: 'C_FirstClass', title: '头等舱', sortable: true, align: 'right', resizable: true, width: 65 },
                 { field: 'C_Business', title: '公务舱', sortable: true, align: 'right', resizable: true, width: 65 },
                 { field: 'C_Economy', title: '经济舱', sortable: true, align: 'right', resizable: true, width: 65 },
                 { field: 'C_Remark', title: 'Remark', sortable: true, resizable: true, width: 500 },
@@ -45,6 +45,11 @@ $(function () {
 
     //Reload Grid
     function ReloadGrid() { grid.datagrid('reload'); }
+    var currDate = new Date();
+    currDate.setDate(currDate.getDate() + 2);
+    $('#txtC_Departure').datebox('setValue', DateFormatter(currDate));
+    $('#ddlFromCity').combobox('setValues', 'PEK');
+    $('#ddlToCity').combobox('setValues', 'CAN');
 });
 
 function IntiComboCity(el, reqVal) {
