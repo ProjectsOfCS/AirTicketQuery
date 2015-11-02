@@ -108,7 +108,7 @@ namespace AirTicketQuery.Modules.Code
                 var values = new object[props.Length];
                 for (int i = 0; i < props.Length; i++)
                 {
-                    values[i] = props[i].GetValue(item, null);
+                    values[i] = EntityUtil.CheckNull(props[i].GetValue(item, null));
                 }
                 dataTable.Rows.Add(values);
             }

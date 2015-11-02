@@ -66,58 +66,107 @@ namespace AirTicketQuery.Modules.Ajax
             string strToCity = req.Form["ToCity"];
             string strDeparture = req.Form["Departure"];
             string sort = req.Form["sort"];
-            int page = Convert.ToInt16(req.Form["page"] ?? "1") - 1;
-            int rowsCnt = Convert.ToInt16(req.Form["rows"] ?? "100");
+            int page = Convert.ToInt16(req.Form["page"] ?? "0");
+            int rowsCnt = Convert.ToInt16(req.Form["rows"] ?? "20");
             string order = req.Form["order"];
+
             Hashtable ht = new Hashtable();
-            List<Flight> lstFlight = new List<Flight>();
+            DB dbi = new DB(SystemConst.DBConnString);
+            string sqlBase = @"SELECT * FROM dbo.FlightInfo";
+            string sqlCnt = @"SELECT COUNT(1) FROM dbo.FlightInfo";
             try
             {
-                List<Flight> rsltLstFlight = new List<Flight>();
                 if (!string.IsNullOrEmpty(strFromCity) && !string.IsNullOrEmpty(strToCity) && !string.IsNullOrEmpty(strDeparture))
                 {
-                    DB dbi = new DB(SystemConst.DBConnString);
+                    bool getQUNAR = Convert.ToInt16(req.Form["QUNAR"] ?? "0") == 1;
+                    bool getCEAIR = Convert.ToInt16(req.Form["CEAIR"] ?? "0") == 1;
+                    bool getCSAIR = Convert.ToInt16(req.Form["CSAIR"] ?? "0") == 1;
+                    bool getCTRIP = Convert.ToInt16(req.Form["CTRIP"] ?? "0") == 1;
+                    bool getWS = Convert.ToInt16(req.Form["WS"] ?? "0") == 1;
+
                     string sqlCity = @"SELECT * FROM dbo.City WHERE C_CODE=@C_CODE";
                     City fromCity = EntityUtil.Create<City>(dbi.GetDataTable(sqlCity, this.InitSqlParams("C_CODE", strFromCity)).Rows[0]);
                     City toCity = EntityUtil.Create<City>(dbi.GetDataTable(sqlCity, this.InitSqlParams("C_CODE", strToCity)).Rows[0]);
 
-                    //lstFlight.AddRange(this.CSAIR_Get(fromCity, toCity, strDeparture));
-                    //lstFlight.AddRange(this.WS_Get(fromCity, toCity, strDeparture));
-                    //lstFlight.AddRange(this.CTRIP_Get(fromCity, toCity, strDeparture));                    
-                    lstFlight.AddRange(this.CEAIR_Get(fromCity, toCity, strDeparture));
-                    //todo: This function is not finished, you can try. 
-                    //lstFlight.AddRange(this.QUNAR_Get(fromCity, toCity, strDeparture));
-
-                    if (!string.IsNullOrEmpty(sort) && !string.IsNullOrEmpty(order))
-                        lstFlight = EntityUtil.SortList(lstFlight, sort, order.ToEnum<EntityUtil.SortOrder>());
-
-                    Flight[] tmpFlights = new Flight[rowsCnt];
-                    if (lstFlight.Count > (page * rowsCnt + rowsCnt))
-                        lstFlight.CopyTo(page * rowsCnt, tmpFlights, 0, rowsCnt);
-                    else if (lstFlight.Count > page * rowsCnt)
+                    string sqlWhere = @" WHERE datediff(MINUTE,C_ADD_TIME,getdate())<60 and C_From=@C_From and C_To=@C_To and datediff(day, C_Departure, @C_Departure)=0";
+                    List<SqlParameter> lstParam = new List<SqlParameter>();
+                    lstParam.Add(new SqlParameter("@C_From", fromCity.C_NAME));
+                    lstParam.Add(new SqlParameter("@C_To", toCity.C_NAME));
+                    lstParam.Add(new SqlParameter("@C_Departure", strDeparture));
+                    StringBuilder sbdatasoure = new StringBuilder();
+                    if (getQUNAR)
                     {
-                        tmpFlights = new Flight[lstFlight.Count - page * rowsCnt];
-                        lstFlight.CopyTo(page * rowsCnt, tmpFlights, 0, lstFlight.Count - page * rowsCnt);
-                    }
-                    else
-                    {
-                        tmpFlights = new Flight[lstFlight.Count];
-                        lstFlight.CopyTo(0, tmpFlights, 0, lstFlight.Count);
+                        sbdatasoure.Append(" OR C_DateSource='QUNAR'");
+                        if (Convert.ToInt16(dbi.ExecScalar(sqlCnt + sqlWhere + " AND C_DateSource='QUNAR'", lstParam.ToArray(), "0")) == 0)
+                        {
+                            List<Flight> lstFlight = this.QUNAR_Get(fromCity, toCity, strDeparture);
+                            dbi.WriteData(lstFlight.ToDataTable(), "FlightInfo");
+                        }
                     }
 
-                    rsltLstFlight.AddRange(tmpFlights);
+                    if (getCEAIR)
+                    {
+                        sbdatasoure.Append(" OR C_DateSource='CE AIR'");
+                        if (Convert.ToInt16(dbi.ExecScalar(sqlCnt + sqlWhere + " AND C_DateSource='CE AIR'", lstParam.ToArray(), "0")) == 0)
+                        {
+                            List<Flight> lstFlight = this.CEAIR_Get(fromCity, toCity, strDeparture);
+                            dbi.WriteData(lstFlight.ToDataTable(), "FlightInfo");
+                        }
+                    }
+
+                    if (getCSAIR)
+                    {
+                        sbdatasoure.Append(" OR C_DateSource='CS AIR'");
+                        if (Convert.ToInt16(dbi.ExecScalar(sqlCnt + sqlWhere + " AND C_DateSource='CS AIR'", lstParam.ToArray(), "0")) == 0)
+                        {
+                            List<Flight> lstFlight = this.CSAIR_Get(fromCity, toCity, strDeparture);
+                            dbi.WriteData(lstFlight.ToDataTable(), "FlightInfo");
+                        }
+                    }
+
+                    if (getCTRIP)
+                    {
+                        sbdatasoure.Append(" OR C_DateSource='CTRIP API'");
+                        if (Convert.ToInt16(dbi.ExecScalar(sqlCnt + sqlWhere + " AND C_DateSource='CTRIP API'", lstParam.ToArray(), "0")) == 0)
+                        {
+                            List<Flight> lstFlight = this.CTRIP_Get(fromCity, toCity, strDeparture);
+                            dbi.WriteData(lstFlight.ToDataTable(), "FlightInfo");
+                        }
+                    }
+
+                    if (getWS)
+                    {
+                        sbdatasoure.Append(" OR C_DateSource='webxml'");
+                        if (Convert.ToInt16(dbi.ExecScalar(sqlCnt + sqlWhere + " AND C_DateSource='webxml'", lstParam.ToArray(), "0")) == 0)
+                        {
+                            List<Flight> lstFlight = this.WS_Get(fromCity, toCity, strDeparture);
+                            dbi.WriteData(lstFlight.ToDataTable(), "FlightInfo");
+                        }
+                    }
+
+                    if (sbdatasoure.Length > 0)
+                        sbdatasoure.Remove(0, 3).Insert(0, " AND (").Append(")");
+
+                    string sqlQuery = sqlBase + sqlWhere + sbdatasoure.ToString();
+                    if (!string.IsNullOrEmpty(sort))
+                        sqlQuery += string.Format(" ORDER BY {0} {1}", sort, order);
+                    int total = Convert.ToInt16(dbi.ExecScalar(sqlCnt, lstParam.ToArray(), "0"));
+                    DataTable dt = dbi.GetPageData(sqlQuery, page, rowsCnt, lstParam.ToArray());
+                    ht.Add("rows", dt);
+                    ht.Add("total", total);
                 }
-
-                int total = lstFlight.Count;
-                ht.Add("rows", EntityUtil.Create(rsltLstFlight));
-                ht.Add("total", total);
+                else
+                {
+                    ht.Add("rows", dbi.GetDataTable(sqlBase + " WHERE 1=2"));
+                    ht.Add("total", 0);
+                }
             }
             catch (Exception ex)
             {
                 ht.Add("err", ex.Message);
                 if (!ht.ContainsKey("rows"))
                 {
-                    ht.Add("rows", EntityUtil.Create(lstFlight));
+                    ht.Add("rows", dbi.GetDataTable(sqlBase + " WHERE 1=2"));
                 }
 
                 ht.Add("total", 0);
@@ -220,15 +269,15 @@ namespace AirTicketQuery.Modules.Ajax
             DateTime dtDepart = DateTime.Parse(departDate);
             string strDepatTime = dtDepart.ToString("yyyy-MM-dd");
             string strParams = string.Format("\"DepartCity\": \"{0}\",\"ArriveCity\": \"{1}\",\"DepartDate\": \"{2}\"",
-                fromCity.C_CODE, toCity.C_CODE, dtDepart.ToString("yyyy-MM-dd"));
+                fromCity.C_WS_CODE, toCity.C_WS_CODE, dtDepart.ToString("yyyy-MM-dd"));
             string strUrl = "http://openapi.ctrip.com/logicsvr/AjaxServerNew.ashx?datatype=jsonp&callProxyKey=flightsearch&requestJson={\"AllianceID\": \"7480\",\"SID\": \"172916\",\"SecretKey\": \"0FEFFC1F-D220-4AAD-8F24-642C962092B7\",\"Routes\": [{" + strParams + "}]}";
 
             WebClient client = new WebClient();
             string downloadStr = client.DownloadString(new Uri(strUrl));
-            System.Diagnostics.Debug.Write(downloadStr);
+            //System.Diagnostics.Debug.Write(downloadStr);
             //string path1 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "11.txt");
             //string downloadStr = File.ReadAllText(path1, System.Text.Encoding.GetEncoding("GB2312"));
-            System.Diagnostics.Debug.Write(downloadStr);
+            //System.Diagnostics.Debug.Write(downloadStr);
             lstFlight = clsParseCTRIP.ParseJson(downloadStr);
             return lstFlight;
         }
@@ -244,7 +293,7 @@ namespace AirTicketQuery.Modules.Ajax
                 Thread thread = new Thread(delegate()
                 {
                     var p = new PageSnatch();
-                    downloadStr = p.Navigate(strUrl, 200);
+                    downloadStr = p.Navigate(strUrl, 50, "flight-info");
                 });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
@@ -325,36 +374,142 @@ namespace AirTicketQuery.Modules.Ajax
         {
             List<Flight> lstFlight = new List<Flight>();
             DateTime dtDepart = DateTime.Parse(departDate);
-            //http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport=%E5%B9%BF%E5%B7%9E&searchArrivalAirport=%E5%8C%97%E4%BA%AC&searchDepartureTime=2015-11-03&searchArrivalTime=2015-11-03&nextNDays=0&startSearch=true&fromCode=CAN&toCode=BJS&from=qunarindex&lowestPrice=null
-
-            string strUrl = string.Format("http://www.ceair.com/flight2014/{0}-{1}-{2}_CNY.html", fromCity, toCity, dtDepart.ToString("yyMMdd"));
+            ////http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport=%E5%B9%BF%E5%B7%9E&searchArrivalAirport=%E5%8C%97%E4%BA%AC&searchDepartureTime=2015-11-03&searchArrivalTime=2015-11-03&nextNDays=0&startSearch=true&fromCode=CAN&toCode=BJS&from=qunarindex&lowestPrice=null
+            string strUrl = string.Format("http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport={0}&searchArrivalAirport={1}&searchDepartureTime={2}&searchArrivalTime=2015-11-03&nextNDays=0&startSearch=true&fromCode=CAN&toCode=BJS&from=qunarindex&lowestPrice=null",
+                 Server.UrlEncode(fromCity.C_NAME), Server.UrlEncode(toCity.C_NAME), dtDepart.ToString("yyyy-MM-dd"));
+            string downloadStr = string.Empty;
             try
             {
                 Thread thread = new Thread(delegate()
                 {
                     var p = new PageSnatch();
-                    //p.Timeout = 20000;
-                    //p.Url = strUrl;
-                    ////p.SnatchCompleted += new SnatchCompletedEventHandler(p_SnatchCompleted);
-                    //p.SnatchCompleted += delegate(object sender, SnatchCompletedEventArgs e)
-                    //        {
-                    //            if (e.Error != null)
-                    //                System.Diagnostics.Debug.Write(e.Error);
-                    //            else
-                    //            {
-                    //                System.Diagnostics.Debug.Write(e.Text);
-                    //                System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
-                    //                System.Diagnostics.Debug.Write(e.TextAsync);
-                    //            }
-                    //        };
-                    System.Diagnostics.Debug.Write(p.Navigate(strUrl, 200));
+                    downloadStr = p.Navigate(strUrl, 50, "hdivResultPanel");
                 });
-
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
                 thread.Join();
             }
             catch (Exception ex) { throw ex; }
+
+            //string path1 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "flight.txt");
+            ////string downloadStr = File.ReadAllText(path1, System.Text.Encoding.GetEncoding("GB2312"));
+            //string downloadStr = File.ReadAllText(path1, System.Text.Encoding.UTF8);
+
+            HtmlDocument htmlPage = new HtmlDocument();
+            htmlPage.LoadHtml(downloadStr);
+            HtmlNode docNode = htmlPage.DocumentNode;
+            HtmlNodeCollection findChildNodes = docNode.ChildNodes;
+            if (findChildNodes.Count == 1)
+            {
+                if (findChildNodes[0].Id.ToUpper().Equals("HDIVRESULTPANEL"))
+                    findChildNodes = docNode.ChildNodes[0].ChildNodes;
+            }
+
+            foreach (HtmlNode childNode in findChildNodes)
+            {
+                System.Diagnostics.Debug.WriteLine(childNode.Name);
+
+                if (childNode.Id.ToUpper().StartsWith("ITEMBARXI"))
+                {
+                    Flight f = new Flight();
+                    f.C_DateSource = "QUNAR";
+                    f.C_From = fromCity.C_NAME;
+                    f.C_To = toCity.C_NAME;
+                    f.C_Departure = departDate;
+                    StringBuilder sbOtherInfo = new StringBuilder();
+                    if (childNode.SelectNodes("div/div")[1].Attributes[0].Value.Equals("c1"))
+                    {
+                        HtmlNode checkNode = childNode.SelectNodes("div/div")[1];
+                        f.C_Airline = this.GetInnerText(checkNode.SelectSingleNode("div[@class='vlc-wp']/div[@class='vlc-con']/div[@class='air-wp']/div[@class='air-row']/div[@class='a-name']"));
+                        f.C_FlightNo = this.GetInnerText(checkNode.SelectSingleNode("div[@class='vlc-wp']/div[@class='vlc-con']/div[@class='air-wp']/div[@class='air-row']/div[@class='a-model']/span"));
+                    }
+
+                    if (childNode.SelectNodes("div/div")[2].Attributes[0].Value.Equals("c2"))
+                    {
+                        HtmlNode checkNode = childNode.SelectNodes("div/div")[2];
+                        f.C_DEPTIME = this.GetInnerText(checkNode.SelectSingleNode("div[@class='a-dep-time']"));
+                        string depAirPort = this.GetInnerText(checkNode.SelectSingleNode("div[@class='a-dep-airport']"));
+                        sbOtherInfo.AppendFormat("departAirPort:{0};", depAirPort);
+                    }
+
+                    if (childNode.SelectNodes("div/div")[3].Attributes[0].Value.Equals("c3"))
+                    {
+                        HtmlNode checkNode = childNode.SelectNodes("div/div")[3];
+                        f.C_TotalTime = this.GetInnerText(checkNode.SelectSingleNode("div[@class='a-zh-wp']"));
+                    }
+
+                    if (childNode.SelectNodes("div/div")[4].Attributes[0].Value.Equals("c4"))
+                    {
+                        HtmlNode checkNode = childNode.SelectNodes("div/div")[4];
+                        f.C_ARRTIME = this.GetInnerText(checkNode.SelectSingleNode("div[@class='a-arr-time']"));
+                        string arrAirPort = this.GetInnerText(checkNode.SelectSingleNode("div[@class='a-arr-airport']"));
+                        sbOtherInfo.AppendFormat("arriveAirPort:{0};", arrAirPort);
+                    }
+
+                    if (childNode.SelectNodes("div/div")[7].Attributes[0].Value.Equals("c7"))
+                    {
+                        HtmlNode mainPriceNode = childNode.SelectNodes("div/div")[7].SelectNodes("div/div")[1].ChildNodes[1];
+                        if (mainPriceNode.Attributes["Style"] != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine(mainPriceNode.Attributes["Style"].Value);
+                            //System.Diagnostics.Debug.WriteLine(mainPriceNode.Attributes["Style"].Value.Equals("width:48px"));
+
+                            SortedList<string, string> lstPrice = new SortedList<string, string>();
+                            if (mainPriceNode.SelectNodes("em").Count == 1)
+                            {
+                                HtmlNode calcutePriceNode = mainPriceNode.SelectSingleNode("em");
+                                foreach (HtmlNode priceNode_b in calcutePriceNode.SelectNodes("b"))
+                                {
+                                    if (priceNode_b.ChildNodes.Count > 1)
+                                    {
+                                        string styleValue = priceNode_b.Attributes["style"].Value;
+                                        string style_LeftValue = styleValue.Split(new char[] { ';' })[1].ToLower().Replace("left: -", string.Empty).Replace("px", string.Empty).Trim();
+                                        int outLeftPX = 0;
+                                        if (int.TryParse(style_LeftValue, out outLeftPX))
+                                        {
+                                            foreach (HtmlNode detialPriceNode in priceNode_b.ChildNodes)
+                                            {
+                                                string key = string.Format("left:-{0}px", outLeftPX);
+
+                                                lstPrice.Add(key, this.GetInnerText(detialPriceNode));
+                                                outLeftPX -= 16;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            lstPrice.Add("left:-16px", this.GetInnerText(priceNode_b.LastChild));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        string styleValue = priceNode_b.Attributes["style"].Value.ToLower().Replace(" ", string.Empty);
+                                        if (lstPrice.ContainsKey(styleValue))
+                                            lstPrice[styleValue] = this.GetInnerText(priceNode_b);
+                                        else
+                                            lstPrice.Add(styleValue, this.GetInnerText(priceNode_b));
+                                    }
+                                }
+                            }
+
+                            if (lstPrice.Count > 0)
+                            {
+                                decimal price = 0;
+                                int i = 1;
+                                foreach (var itmPrice in lstPrice)
+                                {
+                                    price += Convert.ToInt16(itmPrice.Value) * i;
+                                    i *= 10;
+                                }
+
+                                f.C_Price = price;
+                            }
+                        }
+                    }
+
+                    f.C_Remark = sbOtherInfo.ToString();
+                    lstFlight.Add(f);
+                }
+            }
 
             return lstFlight;
         }
@@ -371,7 +526,7 @@ namespace AirTicketQuery.Modules.Ajax
             List<Flight> lstFlight = new List<Flight>();
             DateTime dtDepart = DateTime.Parse(departDate);
             string strUrl = string.Format("http://www.ceair.com/flight2014/{0}-{1}-{2}_CNY.html", fromCity, toCity, dtDepart.ToString("yyMMdd"));
-          
+
             WebClient client = new WebClient();
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "test.txt");
             client.DownloadFile(new Uri(strUrl), path);

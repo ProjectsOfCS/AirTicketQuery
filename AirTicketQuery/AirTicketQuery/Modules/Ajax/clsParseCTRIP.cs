@@ -39,8 +39,8 @@ namespace AirTicketQuery.Modules.Ajax
                             f.C_Departure = flightRoute.DDate;
                             f.C_FlightNo = flightInfo.Flight;
                             f.C_Airline = flightInfo.AirlineCode;
-                            f.C_DEPTIME = flightInfo.TakeOffTime;
-                            f.C_ARRTIME = flightInfo.ArriveTime;
+                            f.C_DEPTIME = flightInfo.TakeOffTime.Substring(11,5);
+                            f.C_ARRTIME = flightInfo.ArriveTime.Substring(11, 5);
                             FlightClass firstFlightClass = flightInfo.FlightClassList.Find(ff => ff.Class.Equals("F", StringComparison.CurrentCultureIgnoreCase));
                             if (firstFlightClass != null)
                                 f.C_FirstClass = Convert.ToDecimal(firstFlightClass.Price);

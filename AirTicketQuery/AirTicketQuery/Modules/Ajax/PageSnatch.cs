@@ -11,7 +11,7 @@ namespace AirTicketQuery.Modules.Ajax
     {
         delegate void BrowserEventHandler();
         private int hitCount = 0;
-        public string Navigate(string url, int timeout)
+        public string Navigate(string url, int timeout,string flightHtmlElementID)
         {
             string gethtml = string.Empty;
             try
@@ -30,6 +30,12 @@ namespace AirTicketQuery.Modules.Ajax
                     {
                         Application.DoEvents();
                         System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Still Loading");
+                        System.Threading.Thread.Sleep(interval);
+                        double t = Math.Ceiling((DateTime.Now - startTime).TotalSeconds);
+                        if (t >= timeout)
+                        {
+                            throw new Exception("Visiting about new exception delay, since the setting is timeout");
+                        }
                     }
 
                     while (hitCount < 10)
@@ -43,11 +49,11 @@ namespace AirTicketQuery.Modules.Ajax
                         BrowserEventHandler browserEventHanler = delegate() { isbusy = !browser.IsBusy; };
                         browser.Invoke(browserEventHanler);
 
-                        if (browser.Document.All["flight-info"] != null)
+                        if (browser.Document.All[flightHtmlElementID] != null)
                         {
                             int len = 0;
-                            if (!string.IsNullOrEmpty(browser.Document.All["flight-info"].InnerHtml))
-                                len = browser.Document.All["flight-info"].InnerHtml.Length;
+                            if (!string.IsNullOrEmpty(browser.Document.All[flightHtmlElementID].InnerHtml))
+                                len = browser.Document.All[flightHtmlElementID].InnerHtml.Length;
                             if (len == length)
                             {
                                 hitCount++;
@@ -57,20 +63,20 @@ namespace AirTicketQuery.Modules.Ajax
                                 hitCount = 0; length = len;
                             }
 
-                            //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All["flight-info"].InnerHtml);
+                            //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All[flightHtmlElementID].InnerHtml);
                         }
 
-                        if (!string.IsNullOrEmpty(browser.Document.All["flight-info"].InnerHtml))
-                            length = browser.Document.All["flight-info"].InnerHtml.Length;
+                        if (!string.IsNullOrEmpty(browser.Document.All[flightHtmlElementID].InnerHtml))
+                            length = browser.Document.All[flightHtmlElementID].InnerHtml.Length;
                         Application.DoEvents();
                         System.Threading.Thread.Sleep(interval);
                     }
 
-                    if (browser.Document.All["flight-info"] != null)
+                    if (browser.Document.All[flightHtmlElementID] != null)
                     {
-                        System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
-                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All["flight-info"].InnerHtml);
-                        gethtml = browser.Document.All["flight-info"].InnerHtml;
+                        //System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
+                        //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All[flightHtmlElementID].InnerHtml);
+                        gethtml = browser.Document.All[flightHtmlElementID].InnerHtml;
                     }
 
                     //var htmldocument = (mshtml.HTMLDocument)browser.Document.DomDocument; System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
