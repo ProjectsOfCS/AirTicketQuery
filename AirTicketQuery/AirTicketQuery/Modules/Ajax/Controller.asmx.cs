@@ -163,6 +163,7 @@ namespace AirTicketQuery.Modules.Ajax
             }
             catch (Exception ex)
             {
+                Log.LogErr(ex);
                 ht.Add("err", ex.Message);
                 if (!ht.ContainsKey("rows"))
                 {
@@ -448,7 +449,9 @@ namespace AirTicketQuery.Modules.Ajax
 
                     if (childNode.SelectNodes("div/div")[7].Attributes[0].Value.Equals("c7"))
                     {
-                        HtmlNode mainPriceNode = childNode.SelectNodes("div/div")[7].SelectNodes("div/div")[1].ChildNodes[1];
+                        HtmlNode mainPriceNode = childNode.SelectNodes("div/div")[7].SelectNodes("div/div")[0].ChildNodes[1];
+                        if (childNode.SelectNodes("div/div")[7].SelectNodes("div/div").Count > 1)
+                            mainPriceNode = childNode.SelectNodes("div/div")[7].SelectNodes("div/div")[1].ChildNodes[1];
                         if (mainPriceNode.Attributes["Style"] != null)
                         {
                             System.Diagnostics.Debug.WriteLine(mainPriceNode.Attributes["Style"].Value);
