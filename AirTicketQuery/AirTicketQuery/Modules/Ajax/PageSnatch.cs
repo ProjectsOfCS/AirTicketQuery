@@ -1,17 +1,17 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 using AirTicketQuery.Modules.Code;
 
 namespace AirTicketQuery.Modules.Ajax
 {
+    /// <summary>
+    /// This class used for get the html source when the page contain Ajax.
+    /// </summary>
     public class PageSnatch
     {
         delegate void BrowserEventHandler();
         private int hitCount = 0;
-        public string Navigate(string url, int timeout,string flightHtmlElementID)
+        public string Navigate(string url, int timeout, string flightHtmlElementID)
         {
             string gethtml = string.Empty;
             try
@@ -19,12 +19,11 @@ namespace AirTicketQuery.Modules.Ajax
                 int interval = 500;
                 using (WebBrowser browser = new WebBrowser())
                 {
-                    browser.ScriptErrorsSuppressed = false;                   
+                    browser.ScriptErrorsSuppressed = false;
+
                     DateTime startTime = DateTime.Now;
                     bool isbusy = true;
                     int length = 0;
-                    //browser.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(browser_DocumentCompleted);
-                    //browser.Navigating += new WebBrowserNavigatingEventHandler(browser_Navigating);
                     browser.Navigate(url);
                     while (browser.ReadyState != WebBrowserReadyState.Complete)
                     {
@@ -38,7 +37,7 @@ namespace AirTicketQuery.Modules.Ajax
                         }
                     }
 
-                    while (hitCount < 10)
+                    while (hitCount < 4)
                     {
                         double t = Math.Ceiling((DateTime.Now - startTime).TotalSeconds);
                         if (t >= timeout)
@@ -54,6 +53,8 @@ namespace AirTicketQuery.Modules.Ajax
                             int len = 0;
                             if (!string.IsNullOrEmpty(browser.Document.All[flightHtmlElementID].InnerHtml))
                                 len = browser.Document.All[flightHtmlElementID].InnerHtml.Length;
+                            System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + string.Format(" hitCnt:{0};len:{1};length:{2}", hitCount, len, length));
+
                             if (len == length)
                             {
                                 hitCount++;
@@ -62,26 +63,20 @@ namespace AirTicketQuery.Modules.Ajax
                             {
                                 hitCount = 0; length = len;
                             }
-
-                            //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All[flightHtmlElementID].InnerHtml);
                         }
 
                         if (!string.IsNullOrEmpty(browser.Document.All[flightHtmlElementID].InnerHtml))
                             length = browser.Document.All[flightHtmlElementID].InnerHtml.Length;
-                        Application.DoEvents();
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " begin DoEvents and Sleep");
+                        //Application.DoEvents();
                         System.Threading.Thread.Sleep(interval);
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " end DoEvents and Sleep");
                     }
 
                     if (browser.Document.All[flightHtmlElementID] != null)
                     {
-                        //System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
-                        //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "->flight-info-:InnerHtml" + browser.Document.All[flightHtmlElementID].InnerHtml);
                         gethtml = browser.Document.All[flightHtmlElementID].InnerHtml;
                     }
-
-                    //var htmldocument = (mshtml.HTMLDocument)browser.Document.DomDocument; System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
-                    //System.Diagnostics.Debug.WriteLine(htmldocument.documentElement.outerHTML); System.Diagnostics.Debug.Write("=".PadLeft(50, '='));
-                    //System.Diagnostics.Debug.WriteLine(browser.Document.Body.OuterHtml);
                 }
             }
             catch (Exception ex)
@@ -91,18 +86,5 @@ namespace AirTicketQuery.Modules.Ajax
 
             return gethtml;
         }
-
-        //private void browser_Navigating(object sender, WebBrowserNavigatingEventArgs e)
-        //{
-        //    //Log.LogInfo("browser_Navigating called.")
-        //    System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "browser_Navigating called.");
-        //    hitCount++;
-        //}
-
-        //private void browser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        //{
-        //    System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "browser_DocumentCompleted called.");
-        //    hitCount++;
-        //}
     }
 }
